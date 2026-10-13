@@ -2,126 +2,275 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Menu Comida Rapida</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Burger Express - Menú</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background-color: #121212; color: #ffffff; padding: 15px; padding-bottom: 90px; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background-color: #121212;
+      color: #ffffff;
+      padding: 16px;
+      padding-bottom: 110px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    header h1 {
+      font-size: 24px;
+      color: #ffb703;
+      margin-bottom: 4px;
+    }
+    header p {
+      font-size: 14px;
+      color: #a0a0a0;
+    }
+    .category-title {
+      font-size: 18px;
+      color: #ffb703;
+      margin: 20px 0 10px 0;
+      border-bottom: 1px solid #333;
+      padding-bottom: 6px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+    }
+    .card {
+      background-color: #1e1e1e;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 1px solid #2a2a2a;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .card-price {
+      font-size: 16px;
+      font-weight: 700;
+      color: #2ec4b6;
+      margin-bottom: 10px;
+    }
+    .btn-add {
+      background-color: #ffb703;
+      color: #000;
+      border: none;
+      padding: 8px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+    }
+    .btn-add:active {
+      transform: scale(0.98);
+    }
     
-    header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #ff9800; padding-bottom: 10px; }
-    header h1 { font-size: 22px; color: #ff9800; text-transform: uppercase; letter-spacing: 1px; }
-    header p { font-size: 13px; color: #aaa; margin-top: 4px; }
+    /* Panel Flotante del Carrito */
+    .cart-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: #1e1e1e;
+      border-top: 1px solid #333;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.5);
+    }
+    .cart-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+    }
+    .btn-checkout {
+      background-color: #2ec4b6;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+    }
 
-    .category-title { font-size: 16px; color: #ff9800; margin: 15px 0 10px 0; border-left: 4px solid #ff9800; padding-left: 8px; }
-
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    
-    .card { background: #1e1e1e; border-radius: 12px; overflow: hidden; border: 1px solid #333; display: flex; flex-direction: column; justify-content: space-between; }
-    .card img { width: 100%; height: 110px; object-fit: cover; }
-    .card-info { padding: 10px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-    .card-title { font-size: 14px; font-weight: bold; margin-bottom: 4px; color: #fff; }
-    .card-desc { font-size: 11px; color: #bbb; margin-bottom: 8px; line-height: 1.2; }
-    .card-price { font-size: 15px; font-weight: bold; color: #4caf50; margin-bottom: 8px; }
-
-    .btn-add { background: #ff9800; color: #000; border: none; padding: 8px; border-radius: 6px; font-weight: bold; width: 100%; font-size: 13px; cursor: pointer; text-align: center; }
-    .btn-add:active { background: #e68a00; }
-
-    /* Barra inferior del carrito */
-    .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e1e1e; padding: 12px 20px; border-top: 2px solid #ff9800; display: flex; justify-content: space-between; align-items: center; z-index: 100; box-shadow: 0 -4px 10px rgba(0,0,0,0.5); }
-    .cart-info { font-size: 14px; }
-    .cart-total { font-size: 18px; font-weight: bold; color: #4caf50; }
-    
-    .btn-checkout { background: #25d366; color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-    .btn-checkout:disabled { background: #555; opacity: 0.6; }
+    /* Modal de Pago */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85);
+      padding: 20px;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+    .modal-content {
+      background: #1e1e1e;
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 400px;
+      margin: 30px auto;
+      border: 1px solid #333;
+    }
+    .modal h2 {
+      color: #ffb703;
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+    .payment-box {
+      background: #2a2a2a;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 12px 0;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .payment-box strong {
+      color: #2ec4b6;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #444;
+      background: #121212;
+      color: #fff;
+      font-size: 14px;
+    }
+    .btn-confirm {
+      background-color: #25d366;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      width: 100%;
+      margin-top: 12px;
+      cursor: pointer;
+    }
+    .btn-close {
+      background: transparent;
+      color: #aaa;
+      border: none;
+      width: 100%;
+      margin-top: 8px;
+      padding: 8px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>🍔 Burger & Grill Express 🌭</h1>
-    <p>¡Haz tu pedido en segundos!</p>
+    <h1>🍔 Burger Express</h1>
+    <p>Selecciona tu pedido y paga por Pago Móvil</p>
   </header>
 
-  <div class="category-title">Hamburguesas & Pepitos</div>
+  <!-- Categorías y Productos -->
+  <div class="category-title">🍔 Hamburguesas</div>
   <div class="grid">
-    
     <div class="card">
-      <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400" alt="Burger Especial">
-      <div class="card-info">
-        <div>
-          <div class="card-title">Burger Doble Queso</div>
-          <div class="card-desc">Carne 150g, tocineta, queso cheddar, cebolla caramelizada.</div>
-        </div>
-        <div>
-          <div class="card-price">$6.00</div>
-          <button class="btn-add" onclick="addToCart('Burger Doble Queso', 6.00)">+ Agregar</button>
-        </div>
-      </div>
+      <div class="card-title">Hamburguesa Sencilla</div>
+      <div class="card-price">$3.00</div>
+      <button class="btn-add" onclick="addToCart('Hamburguesa Sencilla', 3.00)">+ Agregar</button>
     </div>
-
     <div class="card">
-      <img src="https://images.unsplash.com/photo-1625813506062-0aeb1d7a094b?w=400" alt="Pepito Mixto">
-      <div class="card-info">
-        <div>
-          <div class="card-title">Pepito Mixto (30cm)</div>
-          <div class="card-desc">Carne, pollo, queso mañanero, papitas y salsas del cliente.</div>
-        </div>
-        <div>
-          <div class="card-price">$8.00</div>
-          <button class="btn-add" onclick="addToCart('Pepito Mixto 30cm', 8.00)">+ Agregar</button>
-        </div>
-      </div>
+      <div class="card-title">Hamburguesa Especial</div>
+      <div class="card-price">$5.00</div>
+      <button class="btn-add" onclick="addToCart('Hamburguesa Especial', 5.00)">+ Agregar</button>
     </div>
-
   </div>
 
-  <div class="category-title">Perros Calientes & Combos</div>
+  <div class="category-title">🌭 Perros Calientes</div>
   <div class="grid">
-    
     <div class="card">
-      <img src="https://images.unsplash.com/photo-1619740455993-9e612b1af08a?w=400" alt="Perro Especial">
-      <div class="card-info">
-        <div>
-          <div class="card-title">Perro Caliente Especial</div>
-          <div class="card-desc">Salchicha jumbo, cebolla, repollo, queso rallado, tocineta.</div>
-        </div>
-        <div>
-          <div class="card-price">$2.50</div>
-          <button class="btn-add" onclick="addToCart('Perro Especial', 2.50)">+ Agregar</button>
-        </div>
-      </div>
+      <div class="card-title">Perro Sencillo</div>
+      <div class="card-price">$2.00</div>
+      <button class="btn-add" onclick="addToCart('Perro Sencillo', 2.00)">+ Agregar</button>
     </div>
-
     <div class="card">
-      <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400" alt="Combo Familiar">
-      <div class="card-info">
-        <div>
-          <div class="card-title">Combo 2 Burgers + Papas</div>
-          <div class="card-desc">2 Hamburguesas sencillas + ración de papas fritas.</div>
-        </div>
-        <div>
-          <div class="card-price">$10.00</div>
-          <button class="btn-add" onclick="addToCart('Combo 2 Burgers + Papas', 10.00)">+ Agregar</button>
-        </div>
-      </div>
+      <div class="card-title">Perro Especial</div>
+      <div class="card-price">$2.50</div>
+      <button class="btn-add" onclick="addToCart('Perro Especial', 2.50)">+ Agregar</button>
     </div>
-
   </div>
 
-  <!-- Carrito Fijo -->
+  <div class="category-title">🥤 Bebidas</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-title">Refresco 1.5L</div>
+      <div class="card-price">$1.80</div>
+      <button class="btn-add" onclick="addToCart('Refresco 1.5L', 1.80)">+ Agregar</button>
+    </div>
+  </div>
+
+  <div class="category-title">🍟 Contornos</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-title">Papas Fritas</div>
+      <div class="card-price">$2.00</div>
+      <button class="btn-add" onclick="addToCart('Papas Fritas', 2.00)">+ Agregar</button>
+    </div>
+  </div>
+
+  <div class="category-title">🍰 Postres</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-title">Torta Fría</div>
+      <div class="card-price">$4.00</div>
+      <button class="btn-add" onclick="addToCart('Torta Fría', 4.00)">+ Agregar</button>
+    </div>
+  </div>
+
+  <!-- Barra de Resumen -->
   <div class="cart-bar">
-    <div class="cart-info">
-      <div>Productos: <span id="cart-count">0</span></div>
-      <div class="cart-total" id="cart-total">$0.00</div>
+    <div class="cart-summary">
+      <span id="cart-count">Productos: 0</span>
+      <span id="cart-total" style="color:#2ec4b6;">Total: $0.00</span>
     </div>
-    <button class="btn-checkout" id="btn-pay" onclick="sendOrder()" disabled>Pedir por WhatsApp</button>
+    <button class="btn-checkout" onclick="openPaymentModal()">Proceder al Pago</button>
+  </div>
+
+  <!-- Modal de Pago Móvil -->
+  <div id="payment-modal" class="modal">
+    <div class="modal-content">
+      <h2>💳 Pasarela Pago Móvil</h2>
+      <p style="font-size: 13px; color: #ccc;">Realiza el pago por el monto total a los siguientes datos:</p>
+      
+      <div class="payment-box">
+        <b>Banco:</b> Banco de Venezuela (0102)<br>
+        <b>Teléfono:</b> 0424-9090289<br>
+        <b>Cédula:</b> V-18.451.548<br>
+        <b>Monto Total:</b> <strong id="modal-total">$0.00</strong>
+      </div>
+
+      <label style="font-size: 13px; color: #ccc;">Número de Referencia (4 a 6 dígitos):</label>
+      <input type="text" id="ref-number" placeholder="Ej: 123456" maxlength="8">
+
+      <button class="btn-confirm" onclick="sendOrderWhatsApp()">Confirmar y Enviar Pedido 📲</button>
+      <button class="btn-close" onclick="closePaymentModal()">Cancelar</button>
+    </div>
   </div>
 
   <script>
-    let tg = window.Telegram.WebApp;
-    tg.expand();
-
     let cart = [];
     let total = 0;
 
@@ -132,31 +281,47 @@
     }
 
     function updateCartUI() {
-      document.getElementById('cart-count').innerText = cart.length;
-      document.getElementById('cart-total').innerText = '$' + total.toFixed(2);
-      
-      const btnPay = document.getElementById('btn-pay');
-      if (cart.length > 0) {
-        btnPay.disabled = false;
-      } else {
-        btnPay.disabled = true;
-      }
+      document.getElementById('cart-count').innerText = `Productos: ${cart.length}`;
+      document.getElementById('cart-total').innerText = `Total: $${total.toFixed(2)}`;
+      document.getElementById('modal-total').innerText = `$${total.toFixed(2)}`;
     }
 
-    function sendOrder() {
-      if (cart.length === 0) return;
+    function openPaymentModal() {
+      if (cart.length === 0) {
+        alert("Agrega al menos un producto al carrito.");
+        return;
+      }
+      document.getElementById('payment-modal').style.display = 'block';
+    }
 
-      let summary = " Hola! Quiero realizar el siguiente pedido:\n\n";
+    function closePaymentModal() {
+      document.getElementById('payment-modal').style.display = 'none';
+    }
+
+    function sendOrderWhatsApp() {
+      const ref = document.getElementById('ref-number').value.trim();
+      if (!ref) {
+        alert("Por favor ingresa el número de referencia del Pago Móvil.");
+        return;
+      }
+
+      let summary = "🍔 *NUEVO PEDIDO - BURGER EXPRESS*\n\n";
       cart.forEach((item, index) => {
         summary += `${index + 1}. ${item.name} - $${item.price.toFixed(2)}\n`;
       });
-      summary += `\n Total a Pagar: $${total.toFixed(2)}`;
 
-      // Reemplaza este número de teléfono con el número del negocio (en formato internacional sin el +)
-      let phone = "584120000000"; 
-      let url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(summary)}`;
+      summary += `\n💵 *Total a pagar:* $${total.toFixed(2)}`;
+      summary += `\n💳 *Pago Móvil Referencia:* #${ref}`;
 
+      const phone = "584249090289"; // Número configurado para recibir pedidos
+      const url = `https://wa.me/${phone}?text=${encodeURIComponent(summary)}`;
       window.open(url, '_blank');
+    }
+
+    // Inicializar Telegram WebApp API
+    if (window.Telegram && window.Telegram.WebApp) {
+      Telegram.WebApp.ready();
+      Telegram.WebApp.expand();
     }
   </script>
 </body>
