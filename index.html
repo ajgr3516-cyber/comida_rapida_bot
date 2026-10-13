@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Menu Comida Rapida</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #121212; color: #ffffff; padding: 15px; padding-bottom: 90px; }
+    
+    header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #ff9800; padding-bottom: 10px; }
+    header h1 { font-size: 22px; color: #ff9800; text-transform: uppercase; letter-spacing: 1px; }
+    header p { font-size: 13px; color: #aaa; margin-top: 4px; }
+
+    .category-title { font-size: 16px; color: #ff9800; margin: 15px 0 10px 0; border-left: 4px solid #ff9800; padding-left: 8px; }
+
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    
+    .card { background: #1e1e1e; border-radius: 12px; overflow: hidden; border: 1px solid #333; display: flex; flex-direction: column; justify-content: space-between; }
+    .card img { width: 100%; height: 110px; object-fit: cover; }
+    .card-info { padding: 10px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .card-title { font-size: 14px; font-weight: bold; margin-bottom: 4px; color: #fff; }
+    .card-desc { font-size: 11px; color: #bbb; margin-bottom: 8px; line-height: 1.2; }
+    .card-price { font-size: 15px; font-weight: bold; color: #4caf50; margin-bottom: 8px; }
+
+    .btn-add { background: #ff9800; color: #000; border: none; padding: 8px; border-radius: 6px; font-weight: bold; width: 100%; font-size: 13px; cursor: pointer; text-align: center; }
+    .btn-add:active { background: #e68a00; }
+
+    /* Barra inferior del carrito */
+    .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e1e1e; padding: 12px 20px; border-top: 2px solid #ff9800; display: flex; justify-content: space-between; align-items: center; z-index: 100; box-shadow: 0 -4px 10px rgba(0,0,0,0.5); }
+    .cart-info { font-size: 14px; }
+    .cart-total { font-size: 18px; font-weight: bold; color: #4caf50; }
+    
+    .btn-checkout { background: #25d366; color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+    .btn-checkout:disabled { background: #555; opacity: 0.6; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🍔 Burger & Grill Express 🌭</h1>
+    <p>¡Haz tu pedido en segundos!</p>
+  </header>
+
+  <div class="category-title">Hamburguesas & Pepitos</div>
+  <div class="grid">
+    
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400" alt="Burger Especial">
+      <div class="card-info">
+        <div>
+          <div class="card-title">Burger Doble Queso</div>
+          <div class="card-desc">Carne 150g, tocineta, queso cheddar, cebolla caramelizada.</div>
+        </div>
+        <div>
+          <div class="card-price">$6.00</div>
+          <button class="btn-add" onclick="addToCart('Burger Doble Queso', 6.00)">+ Agregar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1625813506062-0aeb1d7a094b?w=400" alt="Pepito Mixto">
+      <div class="card-info">
+        <div>
+          <div class="card-title">Pepito Mixto (30cm)</div>
+          <div class="card-desc">Carne, pollo, queso mañanero, papitas y salsas del cliente.</div>
+        </div>
+        <div>
+          <div class="card-price">$8.00</div>
+          <button class="btn-add" onclick="addToCart('Pepito Mixto 30cm', 8.00)">+ Agregar</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="category-title">Perros Calientes & Combos</div>
+  <div class="grid">
+    
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1619740455993-9e612b1af08a?w=400" alt="Perro Especial">
+      <div class="card-info">
+        <div>
+          <div class="card-title">Perro Caliente Especial</div>
+          <div class="card-desc">Salchicha jumbo, cebolla, repollo, queso rallado, tocineta.</div>
+        </div>
+        <div>
+          <div class="card-price">$2.50</div>
+          <button class="btn-add" onclick="addToCart('Perro Especial', 2.50)">+ Agregar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400" alt="Combo Familiar">
+      <div class="card-info">
+        <div>
+          <div class="card-title">Combo 2 Burgers + Papas</div>
+          <div class="card-desc">2 Hamburguesas sencillas + ración de papas fritas.</div>
+        </div>
+        <div>
+          <div class="card-price">$10.00</div>
+          <button class="btn-add" onclick="addToCart('Combo 2 Burgers + Papas', 10.00)">+ Agregar</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Carrito Fijo -->
+  <div class="cart-bar">
+    <div class="cart-info">
+      <div>Productos: <span id="cart-count">0</span></div>
+      <div class="cart-total" id="cart-total">$0.00</div>
+    </div>
+    <button class="btn-checkout" id="btn-pay" onclick="sendOrder()" disabled>Pedir por WhatsApp</button>
+  </div>
+
+  <script>
+    let tg = window.Telegram.WebApp;
+    tg.expand();
+
+    let cart = [];
+    let total = 0;
+
+    function addToCart(name, price) {
+      cart.push({ name, price });
+      total += price;
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      document.getElementById('cart-count').innerText = cart.length;
+      document.getElementById('cart-total').innerText = '$' + total.toFixed(2);
+      
+      const btnPay = document.getElementById('btn-pay');
+      if (cart.length > 0) {
+        btnPay.disabled = false;
+      } else {
+        btnPay.disabled = true;
+      }
+    }
+
+    function sendOrder() {
+      if (cart.length === 0) return;
+
+      let summary = " Hola! Quiero realizar el siguiente pedido:\n\n";
+      cart.forEach((item, index) => {
+        summary += `${index + 1}. ${item.name} - $${item.price.toFixed(2)}\n`;
+      });
+      summary += `\n Total a Pagar: $${total.toFixed(2)}`;
+
+      // Reemplaza este número de teléfono con el número del negocio (en formato internacional sin el +)
+      let phone = "584120000000"; 
+      let url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(summary)}`;
+
+      window.open(url, '_blank');
+    }
+  </script>
+</body>
+</html>
